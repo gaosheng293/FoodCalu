@@ -70,3 +70,42 @@ B --> C{关键词离线翻译}
 C --> D[生成 SQLite .db 文件]
 D --> E[Android Assets]
 E --> F[Room Database]
+
+```
+
+1. **Raw Data**: 获取 USDA `FoundationFoods` 及 `BrandedFoods`。
+2. **Translation**: 使用 Python 脚本配合本地高频词典，将 "Chicken Breast, Raw" 转换为 "鸡胸肉 (生)"。
+3. **Optimization**: 剔除冗余字段，仅保留核心营养素，将数据体积压缩至移动端可用大小。
+
+## 📥 安装指南 (Installation)
+
+1. **克隆项目**
+```bash
+git clone [https://github.com/YourUsername/FoodCalu.git](https://github.com/YourUsername/FoodCalu.git)
+
+```
+
+
+2. **导入 Android Studio**
+* 打开 Android Studio -> File -> Open -> 选择项目根目录。
+
+
+3. **同步 Gradle**
+* 等待 Gradle Sync 完成，下载所需依赖。
+
+
+4. **运行**
+* 连接真机或模拟器 (建议 Android 7.0+)。
+* 点击 **Run**。
+* *注意：首次安装会自动将 Assets 中的数据库写入手机，大约需要 2-3 秒。*
+
+
+
+## 🤝 贡献 (Contributing)
+
+欢迎提交 Issue 或 Pull Request！
+如果你有更好的数据源或翻译字典，请提交至 `python_scripts/` 目录。
+
+## 📄 开源协议 (License)
+
+[MIT License](https://www.google.com/search?q=LICENSE) © 2025 Your Name
