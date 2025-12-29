@@ -81,7 +81,7 @@ E --> F[Room Database]
 
 1. **克隆项目**
 ```bash
-git clone [https://github.com/YourUsername/FoodCalu.git](https://github.com/YourUsername/FoodCalu.git)
+git clone [https://github.com/gaosheng293/FoodCalu.git]
 
 ```
 
