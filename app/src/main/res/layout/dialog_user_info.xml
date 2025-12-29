@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="设置数据与循环进度"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#333"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="性别"
+        android:textColor="#666"
+        android:textSize="12sp"
+        android:layout_marginBottom="4dp"/>
+    <RadioGroup
+        android:id="@+id/rgGender"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="12dp">
+        <RadioButton
+            android:id="@+id/rbMale"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="男"
+            android:checked="true"
+            android:layout_marginEnd="24dp"/>
+        <RadioButton
+            android:id="@+id/rbFemale"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="女"/>
+    </RadioGroup>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="体重 (kg)"
+        android:layout_marginBottom="8dp">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etWeight"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:text="60"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="身高 (cm)"
+            android:layout_marginEnd="4dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etHeight"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:text="170"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="年龄"
+            android:layout_marginStart="4dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etAge"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:text="25"/>
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="设置今天是循环的第几天："
+        android:textColor="#333"
+        android:textStyle="bold"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="8dp"/>
+
+    <RadioGroup
+        android:id="@+id/rgCycleDay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/rbDay1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Day 1 (碳水 1倍)"
+            android:checked="true"/>
+        <RadioButton
+            android:id="@+id/rbDay2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Day 2 (碳水 1倍)"/>
+        <RadioButton
+            android:id="@+id/rbDay3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Day 3 (碳水 2倍)  🔥中碳日"
+            android:textColor="#FF5722"/>
+        <RadioButton
+            android:id="@+id/rbDay4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Day 4 (碳水 1倍)"/>
+        <RadioButton
+            android:id="@+id/rbDay5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Day 5 (碳水 1倍)"/>
+        <RadioButton
+            android:id="@+id/rbDay6"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Day 6 (碳水 3倍)  🔥🔥高碳日"
+            android:textColor="#FF5722"/>
+    </RadioGroup>
+
+</LinearLayout>

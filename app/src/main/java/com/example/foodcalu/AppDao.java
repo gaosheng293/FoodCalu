@@ -20,6 +20,7 @@ public interface AppDao {
     @Query("SELECT * FROM food WHERE id = :id")
     Food getFoodById(int id);
 
+
     // --- 记录相关操作 ---
     @Insert
     void insertRecord(Record record);
@@ -45,4 +46,11 @@ public interface AppDao {
 
     @Delete
     void deleteFood(Food food);
+
+    @Update
+    void updateRecord(Record record);
+
+    // 👇👇👇 新增这个查询 👇👇👇
+    @Query("SELECT * FROM record_table WHERE date = :date AND mealType = :mealType")
+    List<Record> getRecordsByDateAndMealType(String date, int mealType);
 }

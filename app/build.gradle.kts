@@ -32,7 +32,8 @@ android {
 }
 
 dependencies {
-
+    // 必须有这个才能用圆环进度条
+    implementation("com.google.android.material:material:1.9.0")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
