@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F0F0F0">
+    android:background="#F0F0F0"
+    android:fitsSystemWindows="true">
 
     <RelativeLayout
         android:id="@+id/toolbar"
@@ -86,7 +87,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="饮食记录日报"
+                        android:text="饮食记录"
                         android:textSize="14sp"
                         android:textColor="#999"
                         android:layout_marginBottom="24dp"/>
@@ -102,15 +103,33 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:orientation="vertical">
-                            <TextView                     android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" android:text="总摄入" android:textSize="12sp" android:textColor="#999"/>
-                            <TextView                     android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" android:id="@+id/tvTotalCal" android:text="0" android:textSize="28sp" android:textStyle="bold" android:textColor="#2EC195"/>
-                            <TextView                     android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" android:text="千卡" android:textSize="12sp" android:textColor="#999"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="总摄入"
+                                android:textSize="12sp"
+                                android:textColor="#999"/>
+                            <TextView
+                                android:id="@+id/tvTotalCal"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textSize="28sp"
+                                android:textStyle="bold"
+                                android:textColor="#2EC195"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="千卡"
+                                android:textSize="12sp"
+                                android:textColor="#999"/>
                         </LinearLayout>
 
-                        <View android:layout_width="1dp" android:layout_height="match_parent" android:background="#F0F0F0" android:layout_marginHorizontal="16dp"/>
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="#F0F0F0"
+                            android:layout_marginHorizontal="16dp"/>
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -118,16 +137,36 @@
                             android:layout_weight="2"
                             android:orientation="vertical"
                             android:gravity="center_vertical">
-                            <TextView                     android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" android:id="@+id/tvTotalCarbs" android:text="碳水: 0g" android:textSize="14sp" android:textColor="#666"/>
-                            <TextView                     android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" android:id="@+id/tvTotalProtein" android:text="蛋白质: 0g" android:textSize="14sp" android:textColor="#666" android:layout_marginVertical="4dp"/>
-                            <TextView                    android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"  android:id="@+id/tvTotalFat" android:text="脂肪: 0g" android:textSize="14sp" android:textColor="#666"/>
+                            <TextView
+                                android:id="@+id/tvTotalCarbs"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="碳水: 0g"
+                                android:textSize="14sp"
+                                android:textColor="#666"/>
+                            <TextView
+                                android:id="@+id/tvTotalProtein"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="蛋白质: 0g"
+                                android:textSize="14sp"
+                                android:textColor="#666"
+                                android:layout_marginVertical="4dp"/>
+                            <TextView
+                                android:id="@+id/tvTotalFat"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="脂肪: 0g"
+                                android:textSize="14sp"
+                                android:textColor="#666"/>
                         </LinearLayout>
                     </LinearLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginVertical="24dp"/>
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#E0E0E0"
+                        android:layout_marginVertical="24dp"/>
 
                     <LinearLayout
                         android:id="@+id/llExportList"
@@ -140,7 +179,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:layout_marginTop="32dp"
-                        android:text="— Generated by sheng —"
+                        android:text="— Generated by 碳循记账 —"
                         android:textSize="10sp"
                         android:textColor="#CCC"/>
 
