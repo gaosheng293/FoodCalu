@@ -24,6 +24,7 @@
         <activity android:name=".CreateFoodActivity" />
         <activity android:name=".FoodListActivity" />
         <activity android:name=".MealDetailActivity" />
+        <activity android:name=".ExportActivity" />
     </application>
 
 </manifest>

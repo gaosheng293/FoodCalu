@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -68,12 +69,10 @@ public class FoodListActivity extends AppCompatActivity {
         etSearchFood.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 filterList(s.toString());
             }
-
             @Override
             public void afterTextChanged(Editable s) {}
         });
@@ -86,7 +85,6 @@ public class FoodListActivity extends AppCompatActivity {
         lvFoodList.setAdapter(adapter);
     }
 
-    // 👇👇👇 修改后的智能排序搜索 👇👇👇
     private void filterList(String query) {
         displayFoods.clear();
         if (TextUtils.isEmpty(query)) {
@@ -98,29 +96,21 @@ public class FoodListActivity extends AppCompatActivity {
                     displayFoods.add(f);
                 }
             }
-
-            // --- 核心：对结果进行排序 ---
+            // 智能排序：完全匹配 > 开头匹配 > 长度
             Collections.sort(displayFoods, (f1, f2) -> {
                 String s1 = f1.name.toLowerCase();
                 String s2 = f2.name.toLowerCase();
-
-                // 1. 完全匹配最优先 ("鸡蛋" > "鸡蛋面")
                 boolean exact1 = s1.equals(lowerQuery);
                 boolean exact2 = s2.equals(lowerQuery);
                 if (exact1 && !exact2) return -1;
                 if (!exact1 && exact2) return 1;
-
-                // 2. 开头匹配次优先 ("鸡蛋汤" > "西红柿鸡蛋")
                 boolean start1 = s1.startsWith(lowerQuery);
                 boolean start2 = s2.startsWith(lowerQuery);
                 if (start1 && !start2) return -1;
                 if (!start1 && start2) return 1;
-
-                // 3. 字数越少越优先 ("鸡蛋饼" > "韭菜鸡蛋饼")
                 return Integer.compare(s1.length(), s2.length());
             });
         }
-
         if (adapter != null) adapter.notifyDataSetChanged();
     }
 
@@ -153,6 +143,7 @@ public class FoodListActivity extends AppCompatActivity {
         etName.setHint("食物名称 (如: 牛油果)");
         layout.addView(etName);
 
+        // 输入顺序：碳水 -> 蛋白 -> 脂肪
         final EditText etCarbs = new EditText(this);
         etCarbs.setHint("碳水 (克/100g)");
         etCarbs.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
@@ -173,15 +164,28 @@ public class FoodListActivity extends AppCompatActivity {
         builder.setPositiveButton("保存", (dialog, which) -> {
             String name = etName.getText().toString().trim();
             if (!TextUtils.isEmpty(name)) {
+                // 获取输入值
                 double carbs = parseDoubleSafe(etCarbs.getText().toString());
                 double pro = parseDoubleSafe(etProtein.getText().toString());
                 double fat = parseDoubleSafe(etFat.getText().toString());
+
+                // 计算热量
                 double cal = (carbs * 4) + (pro * 4) + (fat * 9);
 
+                // 创建对象
                 Food newFood = new Food(name, cal, carbs, pro, fat);
+
+                // 👇👇👇 核心修复：防止构造函数顺序不一致导致的错位 👇👇👇
+                // 强制手动再赋值一次，确保万无一失
+                newFood.carbs = carbs;
+                newFood.protein = pro;
+                newFood.fat = fat;
+                newFood.calories = cal;
+                newFood.name = name;
+
                 dao.insertFood(newFood);
 
-                Toast.makeText(this, "已添加，热量: " + (int)cal, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "已添加: " + name, Toast.LENGTH_SHORT).show();
                 loadFoodList();
             } else {
                 Toast.makeText(this, "请输入食物名称", Toast.LENGTH_SHORT).show();
@@ -208,17 +212,23 @@ public class FoodListActivity extends AppCompatActivity {
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_record, parent, false);
             }
             Food food = getItem(position);
+
             TextView tvName = convertView.findViewById(R.id.tvFoodName);
             TextView tvWeight = convertView.findViewById(R.id.tvFoodWeight);
             TextView tvCal = convertView.findViewById(R.id.tvItemCalories);
+            TextView tvMacros = convertView.findViewById(R.id.tvMacros); // 新增绑定
+
             TextView tvType = convertView.findViewById(R.id.tvMealType);
             if (tvType != null) tvType.setVisibility(View.GONE);
 
             if (food != null) {
                 tvName.setText(food.name);
-                String desc = String.format("碳%.1f 蛋%.1f 脂%.1f", food.carbs, food.protein, food.fat);
-                tvWeight.setText(desc);
-                tvCal.setText((int)food.calories + " 千卡/100g");
+
+                // 食物库里显示的是每100克的标准数据
+                tvWeight.setText("100克");
+                tvMacros.setText(String.format("碳%.1f 蛋%.1f 脂%.1f", food.carbs, food.protein, food.fat));
+
+                tvCal.setText((int)food.calories + " 千卡");
             }
             return convertView;
         }

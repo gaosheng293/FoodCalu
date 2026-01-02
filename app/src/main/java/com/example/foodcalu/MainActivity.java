@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     // UI 控件
     private TextView tvDate;
     private ImageView ivSettings;
+    private ImageView ivShare;
     private ImageView ivFoodLibrary;
 
     // 仪表盘控件
@@ -97,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
     private void initViews() {
         tvDate = findViewById(R.id.tvDate);
         ivSettings = findViewById(R.id.ivSettings);
+        ivShare = findViewById(R.id.ivShare);
         ivFoodLibrary = findViewById(R.id.ivFoodLibrary);
 
         progressCalorie = findViewById(R.id.progressCalorie);
@@ -130,6 +132,11 @@ public class MainActivity extends AppCompatActivity {
     private void setupListeners() {
         tvDate.setOnClickListener(v -> showDatePicker());
         ivSettings.setOnClickListener(v -> showUserInfoDialog());
+        ImageView ivShare = findViewById(R.id.ivShare); // 别忘了绑定控件
+        if (ivShare != null) {
+            ivShare.setOnClickListener(v -> showExportDialog());
+        }
+
         ivFoodLibrary.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, FoodListActivity.class);
             startActivity(intent);
@@ -152,6 +159,99 @@ public class MainActivity extends AppCompatActivity {
         tvLunchCal.setOnClickListener(v -> navigateToMealDetail(1));
         tvDinnerCal.setOnClickListener(v -> navigateToMealDetail(2));
         tvSnackCal.setOnClickListener(v -> navigateToMealDetail(3));
+    }
+
+    // 新增：导出选择弹窗
+    private void showExportDialog() {
+        // 选项列表
+        String[] options = {
+                "导出今日明细 (小票图)",
+                "导出本周明细 (7天长图)",
+                "复制本月全部记录 (纯文本)"
+        };
+
+        new AlertDialog.Builder(this)
+                .setTitle("选择导出方式")
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        // 1. 今日明细
+                        Intent intent = new Intent(MainActivity.this, ExportActivity.class);
+                        intent.putExtra("START_DATE", currentSelectedDate);
+                        intent.putExtra("END_DATE", currentSelectedDate);
+                        startActivity(intent);
+
+                    } else if (which == 1) {
+                        // 2. 本周明细 (算出本周一和周日)
+                        String[] weekRange = getWeekDateRange(currentSelectedDate);
+                        Intent intent = new Intent(MainActivity.this, ExportActivity.class);
+                        intent.putExtra("START_DATE", weekRange[0]);
+                        intent.putExtra("END_DATE", weekRange[1]);
+                        startActivity(intent);
+
+                    } else {
+                        // 3. 复制本月文本 (Copy to Clipboard)
+                        copyMonthTextToClipboard(currentSelectedDate);
+                    }
+                })
+                .show();
+    }
+
+    // 辅助：获取本周一和周日的日期字符串
+    private String[] getWeekDateRange(String dateStr) {
+        try {
+            Date date = sdf.parse(dateStr);
+            Calendar c = Calendar.getInstance();
+            c.setTime(date);
+
+            // 将第一天设为周一 (中国习惯)
+            c.setFirstDayOfWeek(Calendar.MONDAY);
+
+            // 设为本周一
+            c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+            String start = sdf.format(c.getTime());
+
+            // 设为本周日
+            c.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+            String end = sdf.format(c.getTime());
+
+            return new String[]{start, end};
+        } catch (Exception e) {
+            return new String[]{dateStr, dateStr};
+        }
+    }
+
+    // 辅助：生成文本并复制
+    private void copyMonthTextToClipboard(String dateStr) {
+        String monthStr = dateStr.substring(0, 7); // "2023-10"
+        new Thread(() -> {
+            List<Record> records = dao.getRecordsByMonth(monthStr + "%");
+            StringBuilder sb = new StringBuilder();
+            sb.append("【").append(monthStr).append(" 饮食记录】\n");
+
+            String lastDate = "";
+            String[] mealNames = {"早餐", "午餐", "晚餐", "加餐"};
+
+            for (Record r : records) {
+                if (!r.date.equals(lastDate)) {
+                    sb.append("\n📅 ").append(r.date).append("\n");
+                    lastDate = r.date;
+                }
+                Food f = dao.getFoodById(r.foodId);
+                if (f != null) {
+                    sb.append("- [").append(mealNames[r.mealType]).append("] ")
+                            .append(f.name).append(" ")
+                            .append((int)r.weight).append("g  ")
+                            .append((int)(f.calories * r.weight / 100)).append("kcal\n");
+                }
+            }
+
+            runOnUiThread(() -> {
+                android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                android.content.ClipData clip = android.content.ClipData.newPlainText("Food Records", sb.toString());
+                clipboard.setPrimaryClip(clip);
+                Toast.makeText(this, "本月记录已复制到剪贴板！可直接粘贴分享", Toast.LENGTH_LONG).show();
+            });
+        }).start();
     }
 
     private void navigateToMealDetail(int mealType) {
@@ -348,17 +448,23 @@ public class MainActivity extends AppCompatActivity {
         TextView tvName = itemView.findViewById(R.id.tvFoodName);
         TextView tvWeight = itemView.findViewById(R.id.tvFoodWeight);
         TextView tvCal = itemView.findViewById(R.id.tvItemCalories);
-//        TextView tvType = itemView.findViewById(R.id.tvMealType);
-//        if (tvType != null) tvType.setVisibility(View.GONE);
+        TextView tvMacros = itemView.findViewById(R.id.tvMacros); // 新增绑定
+
+        TextView tvType = itemView.findViewById(R.id.tvMealType);
+        if (tvType != null) tvType.setVisibility(View.GONE);
 
         tvName.setText(food.name);
         tvWeight.setText((int)r.weight + "克");
         tvCal.setText(String.format("%.0f 千卡", itemCal));
 
-        // 点击 -> 修改
-        itemView.setOnClickListener(v -> showBeautifulEditDialog(r));
+        // 👇 计算并显示具体营养素 👇
+        double ratio = r.weight / 100.0;
+        double c = food.carbs * ratio;
+        double p = food.protein * ratio;
+        double f = food.fat * ratio;
+        tvMacros.setText(String.format("碳%.1f 蛋%.1f 脂%.1f", c, p, f));
 
-        // 👇👇👇 新增：长按 -> 删除 👇👇👇
+        itemView.setOnClickListener(v -> showBeautifulEditDialog(r));
         itemView.setOnLongClickListener(v -> {
             new AlertDialog.Builder(this)
                     .setTitle("删除记录")
@@ -366,7 +472,7 @@ public class MainActivity extends AppCompatActivity {
                     .setPositiveButton("删除", (dialog, which) -> {
                         dao.deleteRecord(r);
                         Toast.makeText(this, "已删除", Toast.LENGTH_SHORT).show();
-                        loadDataForDate(currentSelectedDate); // 刷新
+                        loadDataForDate(currentSelectedDate);
                     })
                     .setNegativeButton("取消", null)
                     .show();

@@ -1,48 +1,81 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingVertical="12dp"
-    android:paddingHorizontal="4dp"
-    android:orientation="horizontal"
-    android:gravity="center_vertical">
+    android:layout_marginBottom="8dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="0dp">
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvFoodName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="食物名称"
+                android:textColor="#333"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="6dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/tvFoodWeight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="100克"
+                    android:textColor="#333"
+                    android:textSize="12sp"
+                    android:textStyle="bold"/>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="10dp"
+                    android:background="#E0E0E0"
+                    android:layout_marginHorizontal="8dp"/>
+
+                <TextView
+                    android:id="@+id/tvMacros"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="碳0 蛋0 脂0"
+                    android:textColor="#888"
+                    android:textSize="11sp" />
+            </LinearLayout>
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/tvFoodName"
+            android:id="@+id/tvItemCalories"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="米饭"
+            android:text="0 千卡"
+            android:textColor="#2EC195"
             android:textSize="16sp"
-            android:textColor="#333"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/tvFoodWeight"
+            android:id="@+id/tvMealType"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="100克"
-            android:textSize="12sp"
-            android:textColor="#888"/>
+            android:visibility="gone"/>
+
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/tvItemCalories"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="116"
-        android:textSize="16sp"
-        android:textColor="#FFA726"
-        android:textStyle="bold"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=" kcal"
-        android:textSize="12sp"
-        android:textColor="#888"/>
-</LinearLayout>
+</androidx.cardview.widget.CardView>

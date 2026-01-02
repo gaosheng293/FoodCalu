@@ -50,7 +50,17 @@ public interface AppDao {
     @Update
     void updateRecord(Record record);
 
-    // 👇👇👇 新增这个查询 👇👇👇
+    //  查询某一天、某一餐的记录 (详情页用)
     @Query("SELECT * FROM record_table WHERE date = :date AND mealType = :mealType")
     List<Record> getRecordsByDateAndMealType(String date, int mealType);
+
+    // 查询某个月的记录 (用于复制文本导出) 👇👇👇
+    // 用法：getRecordsByMonth("2023-10%")
+    @Query("SELECT * FROM record_table WHERE date LIKE :datePattern ORDER BY date ASC")
+    List<Record> getRecordsByMonth(String datePattern);
+
+    // 查询日期范围内的记录 (用于本周长图导出) 👇👇👇
+    // 用法：getRecordsByRange("2023-10-23", "2023-10-29")
+    @Query("SELECT * FROM record_table WHERE date >= :startDate AND date <= :endDate ORDER BY date ASC")
+    List<Record> getRecordsByRange(String startDate, String endDate);
 }

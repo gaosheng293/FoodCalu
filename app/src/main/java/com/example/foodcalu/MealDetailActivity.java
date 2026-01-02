@@ -27,12 +27,9 @@ public class MealDetailActivity extends AppCompatActivity {
     private AppDao dao;
 
     private TextView tvPageTitle;
-
-    // 仪表盘控件
     private TextView tvCircleCalVal;
     private TextView tvCarbsGram, tvProteinGram, tvFatGram;
     private CircularProgressIndicator circleCalorie;
-
     private LinearLayout llFoodList;
     private MaterialButton btnAddFood;
 
@@ -53,11 +50,9 @@ public class MealDetailActivity extends AppCompatActivity {
         dao = db.appDao();
 
         initViews();
-
         tvPageTitle.setText(targetDate + " " + mealNames[targetMealType]);
 
         findViewById(R.id.ivBack).setOnClickListener(v -> finish());
-
         btnAddFood.setOnClickListener(v -> {
             Intent intent = new Intent(MealDetailActivity.this, AddRecordActivity.class);
             intent.putExtra("MEAL_TYPE", targetMealType);
@@ -76,13 +71,11 @@ public class MealDetailActivity extends AppCompatActivity {
 
     private void initViews() {
         tvPageTitle = findViewById(R.id.tvPageTitle);
-
         tvCircleCalVal = findViewById(R.id.tvCircleCalVal);
         tvCarbsGram = findViewById(R.id.tvCarbsGram);
         tvProteinGram = findViewById(R.id.tvProteinGram);
         tvFatGram = findViewById(R.id.tvFatGram);
         circleCalorie = findViewById(R.id.circleCalorie);
-
         llFoodList = findViewById(R.id.llFoodList);
         btnAddFood = findViewById(R.id.btnAddFood);
     }
@@ -104,7 +97,7 @@ public class MealDetailActivity extends AppCompatActivity {
                 totalProtein += food.protein * ratio;
                 totalFat += food.fat * ratio;
 
-                addListItem(r, food, itemCal);
+                addListItem(r, food, itemCal, ratio); // 传入 ratio 方便计算
             }
         }
 
@@ -118,24 +111,30 @@ public class MealDetailActivity extends AppCompatActivity {
         circleCalorie.setProgress(progress);
     }
 
-    private void addListItem(Record r, Food food, double itemCal) {
+    // 👇👇👇 修改了这里：显示每个食物的具体营养素 👇👇👇
+    private void addListItem(Record r, Food food, double itemCal, double ratio) {
         View itemView = LayoutInflater.from(this).inflate(R.layout.item_record, null);
 
         TextView tvName = itemView.findViewById(R.id.tvFoodName);
         TextView tvWeight = itemView.findViewById(R.id.tvFoodWeight);
         TextView tvCal = itemView.findViewById(R.id.tvItemCalories);
+        TextView tvMacros = itemView.findViewById(R.id.tvMacros); // 绑定新控件
 
-//        TextView tvType = itemView.findViewById(R.id.tvMealType);
-//        if (tvType != null) tvType.setVisibility(View.GONE);
+        TextView tvType = itemView.findViewById(R.id.tvMealType);
+        if (tvType != null) tvType.setVisibility(View.GONE);
 
         tvName.setText(food.name);
         tvWeight.setText((int)r.weight + "克");
         tvCal.setText(String.format("%.0f 千卡", itemCal));
 
-        // 点击 -> 修改
-        itemView.setOnClickListener(v -> showBeautifulEditDialog(r));
+        // 计算当前重量下的具体营养素
+        double c = food.carbs * ratio;
+        double p = food.protein * ratio;
+        double f = food.fat * ratio;
 
-        // 👇👇👇 新增：长按 -> 删除 👇👇👇
+        tvMacros.setText(String.format("碳%.1f 蛋%.1f 脂%.1f", c, p, f));
+
+        itemView.setOnClickListener(v -> showBeautifulEditDialog(r));
         itemView.setOnLongClickListener(v -> {
             new AlertDialog.Builder(this)
                     .setTitle("删除记录")
@@ -143,7 +142,7 @@ public class MealDetailActivity extends AppCompatActivity {
                     .setPositiveButton("删除", (dialog, which) -> {
                         dao.deleteRecord(r);
                         Toast.makeText(this, "已删除", Toast.LENGTH_SHORT).show();
-                        loadData(); // 刷新本页
+                        loadData();
                     })
                     .setNegativeButton("取消", null)
                     .show();
@@ -157,11 +156,8 @@ public class MealDetailActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View view = LayoutInflater.from(this).inflate(R.layout.dialog_edit_weight, null);
         builder.setView(view);
-
         AlertDialog dialog = builder.create();
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        }
+        if (dialog.getWindow() != null) dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         EditText etWeight = view.findViewById(R.id.etDialogWeight);
         Button btnCancel = view.findViewById(R.id.btnDialogCancel);
@@ -171,27 +167,21 @@ public class MealDetailActivity extends AppCompatActivity {
         etWeight.setSelection(etWeight.getText().length());
 
         btnCancel.setOnClickListener(v -> dialog.dismiss());
-
         btnSave.setOnClickListener(v -> {
             String newWeightStr = etWeight.getText().toString();
             if (!TextUtils.isEmpty(newWeightStr)) {
                 double newWeight = Double.parseDouble(newWeightStr);
-                // 👇👇👇 新增：判0逻辑 👇👇👇
                 if (newWeight <= 0) {
                     Toast.makeText(this, "重量必须大于 0", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
                 record.weight = newWeight;
                 dao.updateRecord(record);
                 Toast.makeText(this, "已更新", Toast.LENGTH_SHORT).show();
                 loadData();
                 dialog.dismiss();
-            } else {
-                Toast.makeText(this, "请输入重量", Toast.LENGTH_SHORT).show();
             }
         });
-
         dialog.show();
     }
 }

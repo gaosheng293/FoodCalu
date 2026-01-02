@@ -108,4 +108,4 @@ git clone [https://github.com/YourUsername/FoodCalu.git](https://github.com/Your
 
 ## 📄 开源协议 (License)
 
-[MIT License](https://www.google.com/search?q=LICENSE) © 2025 Your Name
+[MIT License](https://www.google.com/search?q=LICENSE) © 2025 sheng

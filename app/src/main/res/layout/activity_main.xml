@@ -57,6 +57,16 @@
                     android:layout_centerVertical="true"
                     android:src="@android:drawable/ic_menu_manage"
                     app:tint="#666" />
+                <ImageView
+                    android:id="@+id/ivShare"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_toStartOf="@id/ivSettings"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="16dp"
+                    android:src="@android:drawable/ic_menu_share"
+                    app:tint="#666"
+                    android:tooltipText="生成日报"/>
             </RelativeLayout>
 
             <androidx.cardview.widget.CardView
