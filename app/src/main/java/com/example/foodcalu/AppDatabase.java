@@ -6,7 +6,7 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
 // 声明包含哪些表，版本号为1
-@Database(entities = {Food.class, Record.class}, version = 1, exportSchema = false)
+@Database(entities = {Food.class, Record.class, MealSet.class, MealSetItem.class}, version = 2, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static volatile AppDatabase INSTANCE;

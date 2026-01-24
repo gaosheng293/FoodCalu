@@ -63,4 +63,40 @@ public interface AppDao {
     // 用法：getRecordsByRange("2023-10-23", "2023-10-29")
     @Query("SELECT * FROM record_table WHERE date >= :startDate AND date <= :endDate ORDER BY date ASC")
     List<Record> getRecordsByRange(String startDate, String endDate);
+
+    // 1. 创建套餐名字，并返回新套餐的 ID (long类型)
+    @Insert
+    long insertMealSet(MealSet mealSet);
+
+    // 2. 批量插入套餐里的食物
+    @Insert
+    void insertMealSetItems(List<MealSetItem> items);
+
+    // 3. 获取所有套餐列表
+    @Query("SELECT * FROM MealSet ORDER BY id DESC")
+    List<MealSet> getAllMealSets();
+
+    // 4. 获取某个套餐里的所有食物详情
+    @Query("SELECT * FROM MealSetItem WHERE setId = :setId")
+    List<MealSetItem> getMealSetItems(int setId);
+
+    // 5. 删除套餐 (可选)
+    @Delete
+    void deleteMealSet(MealSet mealSet);
+
+    @Query("DELETE FROM MealSetItem WHERE setId = :setId")
+    void deleteMealSetItems(int setId);
+
+    // 1. 根据名字查套餐 (用于判断是否已存在)
+    @Query("SELECT * FROM MealSet WHERE name = :name LIMIT 1")
+    MealSet getMealSetByName(String name);
+
+    // 2. 更新套餐信息 (用于改名)
+    @Update
+    void updateMealSet(MealSet mealSet);
+
+    // 3. 删除某个套餐的所有明细 (用于覆盖保存时，先清空旧的)
+    @Query("DELETE FROM MealSetItem WHERE setId = :setId")
+    void deleteMealSetItemsBySetId(int setId);
+
 }

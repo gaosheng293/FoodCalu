@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MealDetailActivity extends AppCompatActivity {
@@ -59,8 +60,83 @@ public class MealDetailActivity extends AppCompatActivity {
             intent.putExtra("DATE_KEY", targetDate);
             startActivity(intent);
         });
-
+        findViewById(R.id.btnSaveAsSet).setOnClickListener(v -> showSaveSetDialog());
         loadData();
+    }
+
+    // 1. 修改保存弹窗逻辑
+    private void showSaveSetDialog() {
+        List<Record> currentRecords = dao.getRecordsByDateAndMealType(targetDate, targetMealType);
+        if (currentRecords.isEmpty()) {
+            Toast.makeText(this, "当前没有食物，无法保存", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        final EditText etName = new EditText(this);
+        etName.setHint("输入套餐名称");
+
+        new AlertDialog.Builder(this)
+                .setTitle("存为套餐")
+                .setView(etName)
+                .setPositiveButton("保存", (dialog, which) -> {
+                    String name = etName.getText().toString().trim();
+                    if (!TextUtils.isEmpty(name)) {
+                        checkAndSaveSet(name, currentRecords); // 👈 改为调用检查方法
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .show();
+    }
+
+    // 2. 新增：检查是否重名
+    private void checkAndSaveSet(String name, List<Record> records) {
+        new Thread(() -> {
+            MealSet existingSet = dao.getMealSetByName(name);
+            runOnUiThread(() -> {
+                if (existingSet != null) {
+                    // 发现重名，弹出覆盖确认框
+                    new AlertDialog.Builder(this)
+                            .setTitle("套餐已存在")
+                            .setMessage("“" + name + "” 已存在，是否覆盖旧的设置？")
+                            .setPositiveButton("覆盖", (d, w) -> overwriteMealSet(existingSet, records))
+                            .setNegativeButton("取消", null)
+                            .show();
+                } else {
+                    // 没重名，直接存
+                    saveNewMealSet(name, records);
+                }
+            });
+        }).start();
+    }
+
+    // 3. 覆盖旧套餐 (核心修改逻辑)
+    private void overwriteMealSet(MealSet set, List<Record> records) {
+        new Thread(() -> {
+            // 先删掉旧的详情
+            dao.deleteMealSetItemsBySetId(set.id);
+
+            // 再插入新的详情
+            List<MealSetItem> items = new ArrayList<>();
+            for (Record r : records) {
+                items.add(new MealSetItem(set.id, r.foodId, r.weight));
+            }
+            dao.insertMealSetItems(items);
+
+            runOnUiThread(() -> Toast.makeText(this, "套餐已更新！", Toast.LENGTH_SHORT).show());
+        }).start();
+    }
+
+    // 4. 原来的保存逻辑 (稍微改名)
+    private void saveNewMealSet(String name, List<Record> records) {
+        new Thread(() -> {
+            long setId = dao.insertMealSet(new MealSet(name));
+            List<MealSetItem> items = new ArrayList<>();
+            for (Record r : records) {
+                items.add(new MealSetItem((int)setId, r.foodId, r.weight));
+            }
+            dao.insertMealSetItems(items);
+            runOnUiThread(() -> Toast.makeText(this, "新套餐保存成功！", Toast.LENGTH_SHORT).show());
+        }).start();
     }
 
     @Override

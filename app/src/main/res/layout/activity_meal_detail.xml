@@ -32,6 +32,18 @@
             android:textColor="#333"
             android:textSize="18sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/btnSaveAsSet"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:gravity="center"
+            android:paddingHorizontal="16dp"
+            android:text="存为套餐"
+            android:textColor="#2EC195"
+            android:textSize="14sp"
+            android:textStyle="bold"/>
     </RelativeLayout>
 
     <androidx.core.widget.NestedScrollView

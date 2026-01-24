@@ -1,5 +1,6 @@
 package com.example.foodcalu;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
@@ -58,8 +60,59 @@ public class AddRecordActivity extends AppCompatActivity {
         btnSave.setOnClickListener(v -> saveRecord());
 
         actvFood.requestFocus();
+        findViewById(R.id.btnImportSet).setOnClickListener(v -> showImportSetDialog());
+
+
     }
 
+    // 显示套餐列表弹窗
+    private void showImportSetDialog() {
+        List<MealSet> sets = dao.getAllMealSets();
+
+        // 准备选项：先把套餐名放进去
+        String[] names = new String[sets.size()];
+        for (int i = 0; i < sets.size(); i++) {
+            names[i] = sets.get(i).name;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("选择套餐导入");
+
+        // 如果没有套餐，就显示“去管理”
+        if (sets.isEmpty()) {
+            builder.setMessage("暂无套餐");
+        } else {
+            builder.setItems(names, (dialog, which) -> {
+                importSetToRecord(sets.get(which));
+            });
+        }
+
+        // 👇👇👇 新增：中性按钮“管理套餐” 👇👇👇
+        builder.setNeutralButton("管理套餐", (dialog, which) -> {
+            startActivity(new Intent(this, MealSetManagerActivity.class));
+        });
+
+        builder.setNegativeButton("取消", null);
+        builder.show();
+    }
+
+    // 核心逻辑：导入套餐
+    private void importSetToRecord(MealSet set) {
+        new Thread(() -> {
+            // 1. 查出这个套餐里包含哪些食物
+            List<MealSetItem> items = dao.getMealSetItems(set.id);
+
+            // 2. 循环插入到今天的记录表 Record 中
+            for (MealSetItem item : items) {
+                dao.insertRecord(new Record(item.foodId, targetDate, targetMealType, item.weight));
+            }
+
+            runOnUiThread(() -> {
+                Toast.makeText(this, "已导入: " + set.name, Toast.LENGTH_SHORT).show();
+                finish(); // 导入完直接关闭页面，回上一页看结果
+            });
+        }).start();
+    }
     private void initViews() {
         tvTitle = findViewById(R.id.tvTitle);
         ivBack = findViewById(R.id.ivBack);
